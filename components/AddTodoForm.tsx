@@ -1,21 +1,21 @@
 'use client';
 
 import { addTodo } from '@/actions/todos';
-import { useOptimistic, useRef } from 'react';
+import { useRef, useTransition } from 'react';
 import styles from './AddTodoForm.module.css';
 
 export default function AddTodoForm() {
   const formRef = useRef<HTMLFormElement>(null);
-  const [isPending, startTransition] = useOptimistic(false);
+  const [isPending, startTransition] = useTransition();
 
   async function handleSubmit(formData: FormData) {
     const text = formData.get('text') as string;
     
     if (!text.trim()) return;
 
-    startTransition(async () => {
+    startTransition(() => {
       formRef.current?.reset();
-      await addTodo(text);
+      addTodo(text);
     });
   }
 

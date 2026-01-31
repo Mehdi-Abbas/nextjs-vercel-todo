@@ -1,7 +1,7 @@
 'use client';
 
 import { toggleTodo, deleteTodo } from '@/actions/todos';
-import { useOptimistic } from 'react';
+import { useOptimistic, useTransition } from 'react';
 import type { Todo } from '@/db/schema';
 import styles from './TodoItem.module.css';
 
@@ -10,18 +10,23 @@ type Props = {
 };
 
 export default function TodoItem({ todo }: Props) {
+  const [isPending, startTransition] = useTransition();
   const [optimisticCompleted, setOptimisticCompleted] = useOptimistic(
     todo.completed,
-    (state, newState: boolean) => newState
+    (_, newState: boolean) => newState
   );
 
-  async function handleToggle() {
-    setOptimisticCompleted(!optimisticCompleted);
-    await toggleTodo(todo.id);
+  function handleToggle() {
+    startTransition(() => {
+      setOptimisticCompleted(!optimisticCompleted);
+      toggleTodo(todo.id);
+    });
   }
 
-  async function handleDelete() {
-    await deleteTodo(todo.id);
+  function handleDelete() {
+    startTransition(() => {
+      deleteTodo(todo.id);
+    });
   }
 
   return (
@@ -32,12 +37,13 @@ export default function TodoItem({ todo }: Props) {
           checked={optimisticCompleted}
           onChange={handleToggle}
           className={styles.checkbox}
+          disabled={isPending}
         />
         <span className={optimisticCompleted ? styles.textCompleted : styles.text}>
           {todo.text}
         </span>
       </label>
-      <button onClick={handleDelete} className={styles.deleteButton}>
+      <button onClick={handleDelete} className={styles.deleteButton} disabled={isPending}>
         Delete
       </button>
     </div>
