@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <main className={styles.main}>
       <div className={styles.container}>
-        <h1 className={styles.title}>Todo App</h1>
+        <h1 className={styles.title}>Todo App 2</h1>
         <p className={styles.subtitle}>
           Built with Next.js 15 App Router, Vercel Postgres, and Drizzle ORM
         </p>
